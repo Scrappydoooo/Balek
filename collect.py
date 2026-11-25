@@ -2,16 +2,18 @@
 """Collecteur ligne J : trains Vernouillet-Verneuil -> Paris Saint-Lazare.
 
 Interroge l'API PRIM d'Ile-de-France Mobilites (prochains passages, SIRI Lite)
-et enregistre, pour chaque train du matin vers Paris, l'heure prevue et l'heure
-reelle au depart de Vernouillet-Verneuil et a l'arrivee a Saint-Lazare, ainsi
-que les suppressions annoncees en temps reel.
+et enregistre l'heure prevue et l'heure reelle, ainsi que les suppressions
+annoncees en temps reel :
+- le matin, trains Vernouillet-Verneuil -> Paris Saint-Lazare (dir "aller") ;
+- le soir, trains Paris Saint-Lazare -> Vernouillet-Verneuil (dir "retour").
 
 Un fichier par jour : data/AAAA-MM-JJ.json. Le lancer toutes les 5 minutes.
 Variables d'environnement :
   PRIM_API_KEY   (obligatoire) cle API PRIM
   VERNOUILLET_REF, LAZARE_REF  (facultatif) MonitoringRef PRIM a forcer,
                  ex. STIF:StopArea:SP:12345:
-  COLLECT_FROM, COLLECT_TO   plage des departs suivis a Vernouillet (05:30, 10:00)
+  COLLECT_FROM, COLLECT_TO   matin : departs de Vernouillet suivis (05:30, 10:00)
+  EVENING_ARR_FROM, EVENING_ARR_TO   soir : arrivees a Vernouillet suivies (15:45, 23:00)
 Option --dry-run : affiche ce qui est recu sans rien ecrire.
 """
 import json, os, re, sys, unicodedata, urllib.parse, urllib.request
@@ -28,6 +30,9 @@ DATA = Path(__file__).resolve().parent / "data"
 KEY = os.environ.get("PRIM_API_KEY", "").strip()
 FROM = os.environ.get("COLLECT_FROM", "05:30")
 TO = os.environ.get("COLLECT_TO", "10:00")
+# Soir : trains venant de Paris qui arrivent a Vernouillet dans cette plage
+EVE_ARR_FROM = os.environ.get("EVENING_ARR_FROM", "15:45")
+EVE_ARR_TO = os.environ.get("EVENING_ARR_TO", "23:00")
 DRY = "--dry-run" in sys.argv
 
 
@@ -145,41 +150,67 @@ def main():
     doc = json.loads(path.read_text()) if path.exists() else {"date": day, "trains": [], "messages": []}
     trains = {t["key"]: t for t in doc["trains"]}
 
-    # 1. Departs de Vernouillet-Verneuil vers Paris
-    for v in visits(stops["vernouillet"]):
+    vern = visits(stops["vernouillet"])
+    laz = visits(stops["lazare"])
+
+    def sticky(t, status):
+        """Une suppression reste acquise tant qu'aucun nouvel etat ne la dement."""
+        return status == "cancelled" or (t.get("cancelled", False) and status in ("", "noreport"))
+
+    # 1a. Matin : departs de Vernouillet-Verneuil vers Paris
+    # 1b. Soir : arrivees a Vernouillet-Verneuil des trains venant de Paris
+    for v in vern:
         mvj, call, num, dvj = journey(v)
         dest = val(mvj.get("DestinationName")) or val(call.get("DestinationDisplay")) or ""
-        if "lazare" not in norm(dest):
-            continue
-        aimed = parse_t(call.get("AimedDepartureTime"))
-        if not aimed or aimed.strftime("%Y-%m-%d") != day or not (FROM <= hm(aimed) <= TO):
-            continue
-        exp = parse_t(call.get("ExpectedDepartureTime"))
-        status = (call.get("DepartureStatus") or "").lower()
-        key = num or dvj or f"{hm(aimed)}-{val(mvj.get('JourneyNote'))}"
-        t = trains.setdefault(key, {"key": key, "first_seen": hm(now)})
-        t.update({
-            "num": num, "ref": dvj, "t": hm(aimed),
-            "mission": val(mvj.get("JourneyNote")) or "",
-            "dep_exp": hm(exp), "dep_delay": mins(aimed, exp),
-            "cancelled": status == "cancelled" or t.get("cancelled", False) and status in ("", "noreport"),
-            "dep_status": status, "last_seen": hm(now),
-        })
-
-    # 2. Arrivees a Saint-Lazare des memes trains
-    if trains:
-        by_num = {t["num"]: t for t in trains.values() if t.get("num")}
-        by_ref = {t["ref"]: t for t in trains.values() if t.get("ref")}
-        for v in visits(stops["lazare"]):
-            mvj, call, num, dvj = journey(v)
-            t = by_num.get(num) or by_ref.get(dvj)
-            if not t:
+        mission = val(mvj.get("JourneyNote")) or ""
+        if "lazare" in norm(dest):
+            aimed = parse_t(call.get("AimedDepartureTime"))
+            if not aimed or aimed.strftime("%Y-%m-%d") != day or not (FROM <= hm(aimed) <= TO):
                 continue
+            exp = parse_t(call.get("ExpectedDepartureTime"))
+            status = (call.get("DepartureStatus") or "").lower()
+            key = num or dvj or f"{hm(aimed)}-{mission}"
+            t = trains.setdefault(key, {"key": key, "first_seen": hm(now)})
+            t.update({"dir": "aller", "num": num, "ref": dvj, "t": hm(aimed), "mission": mission,
+                      "dep_exp": hm(exp), "dep_delay": mins(aimed, exp),
+                      "cancelled": sticky(t, status), "dep_status": status, "last_seen": hm(now)})
+        else:
+            aimed = parse_t(call.get("AimedArrivalTime")) or parse_t(call.get("AimedDepartureTime"))
+            if not aimed or aimed.strftime("%Y-%m-%d") != day or not (EVE_ARR_FROM <= hm(aimed) <= EVE_ARR_TO):
+                continue
+            exp = parse_t(call.get("ExpectedArrivalTime")) or parse_t(call.get("ExpectedDepartureTime"))
+            status = (call.get("ArrivalStatus") or call.get("DepartureStatus") or "").lower()
+            key = "R" + (num or dvj or f"{hm(aimed)}-{mission}")
+            t = trains.setdefault(key, {"key": key, "first_seen": hm(now)})
+            t.update({"dir": "retour", "num": num, "ref": dvj, "mission": mission, "dest": dest[:40],
+                      "arr_t": hm(aimed), "arr_exp": hm(exp), "arr_delay": mins(aimed, exp),
+                      "arr_status": status, "cancelled": sticky(t, status), "last_seen": hm(now)})
+
+    # 2. A Saint-Lazare : arrivee des trains du matin, depart des trains du soir
+    aller = [t for t in trains.values() if t.get("dir", "aller") == "aller"]
+    retour = [t for t in trains.values() if t.get("dir") == "retour"]
+    idx = lambda lst: ({t["num"]: t for t in lst if t.get("num")}, {t["ref"]: t for t in lst if t.get("ref")})
+    a_num, a_ref = idx(aller)
+    r_num, r_ref = idx(retour)
+    for v in laz:
+        mvj, call, num, dvj = journey(v)
+        t = a_num.get(num) or a_ref.get(dvj)
+        if t:
             a_aim = parse_t(call.get("AimedArrivalTime"))
             a_exp = parse_t(call.get("ExpectedArrivalTime"))
             st = (call.get("ArrivalStatus") or "").lower()
             t.update({"arr_t": hm(a_aim), "arr_exp": hm(a_exp), "arr_delay": mins(a_aim, a_exp),
                       "arr_status": st, "arr_seen": hm(now)})
+            if st == "cancelled":
+                t["cancelled"] = True
+            continue
+        t = r_num.get(num) or r_ref.get(dvj)
+        if t:
+            d_aim = parse_t(call.get("AimedDepartureTime"))
+            d_exp = parse_t(call.get("ExpectedDepartureTime"))
+            st = (call.get("DepartureStatus") or "").lower()
+            t.update({"t": hm(d_aim), "dep_exp": hm(d_exp), "dep_delay": mins(d_aim, d_exp),
+                      "dep_status": st, "dep_seen": hm(now)})
             if st == "cancelled":
                 t["cancelled"] = True
 
@@ -196,12 +227,12 @@ def main():
     except Exception as e:
         print("info trafic indisponible :", e)
 
-    doc["trains"] = sorted(trains.values(), key=lambda t: t.get("t") or "")
+    doc["trains"] = sorted(trains.values(), key=lambda t: (t.get("dir", "aller"), t.get("t") or t.get("arr_t") or ""))
     doc["updated"] = now.isoformat(timespec="minutes")
     doc["stops"] = stops
     print(f"{day} {hm(now)} : {len(doc['trains'])} trains suivis")
     for t in doc["trains"]:
-        print(f"  {t.get('t')} {t.get('mission',''):5} dep {t.get('dep_delay')} arr {t.get('arr_delay')}"
+        print(f"  {t.get('dir','aller'):6} {t.get('t')} {t.get('mission',''):5} dep {t.get('dep_delay')} arr {t.get('arr_delay')}"
               f"{' SUPPRIME' if t.get('cancelled') else ''}")
     if not DRY:
         DATA.mkdir(exist_ok=True)
