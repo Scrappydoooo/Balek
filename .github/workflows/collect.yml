@@ -16,14 +16,17 @@ jobs:
   collect:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    defaults:
-      run:
-        working-directory: collecteur-ligne-j
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Trouver le collecteur
+        run: |
+          f=$(find . -name collect.py -not -path './.git/*' | head -1)
+          if [ -z "$f" ]; then echo "collect.py introuvable dans le dépôt"; find . -not -path './.git/*' | head -50; exit 1; fi
+          echo "DIR=$(dirname "$f")" >> "$GITHUB_ENV"
+          echo "Collecteur trouvé dans : $(dirname "$f")"
       - name: Relever les trains
         env:
           PRIM_API_KEY: ${{ secrets.PRIM_API_KEY }}
@@ -31,12 +34,13 @@ jobs:
           LAZARE_REF: ${{ vars.LAZARE_REF }}
           COLLECT_FROM: "05:30"
           COLLECT_TO: "10:00"
-        run: python collect.py
+        run: cd "$DIR" && python collect.py
       - name: Enregistrer
         run: |
+          cd "$DIR"
           git config user.name "collecteur-ligne-j"
           git config user.email "collecteur@users.noreply.github.com"
-          git add data
+          mkdir -p data && git add data
           if git diff --cached --quiet; then echo "Rien de neuf"; exit 0; fi
           git commit -m "Relevé $(date -u +%Y-%m-%dT%H:%MZ)"
           for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
