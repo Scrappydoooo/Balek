@@ -21,26 +21,39 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Trouver le collecteur
+      - name: Préparer la branche des relevés
+        env:
+          REPO_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}
         run: |
           f=$(find . -name collect.py -not -path './.git/*' | head -1)
-          if [ -z "$f" ]; then echo "collect.py introuvable dans le dépôt"; find . -not -path './.git/*' | head -50; exit 1; fi
-          echo "DIR=$(dirname "$f")" >> "$GITHUB_ENV"
-          echo "Collecteur trouvé dans : $(dirname "$f")"
+          if [ -z "$f" ]; then echo "collect.py introuvable dans le dépôt"; exit 1; fi
+          if git ls-remote --exit-code --heads "$REPO_URL" releves >/dev/null; then
+            git clone -q --depth 1 -b releves "$REPO_URL" "$RUNNER_TEMP/store"
+          else
+            mkdir -p "$RUNNER_TEMP/store" && cd "$RUNNER_TEMP/store"
+            git init -q -b releves && git remote add origin "$REPO_URL"
+          fi
+          cp "$f" "$RUNNER_TEMP/store/collect.py"
       - name: Relever les trains
+        working-directory: ${{ runner.temp }}/store
         env:
           PRIM_API_KEY: ${{ secrets.PRIM_API_KEY }}
           VERNOUILLET_REF: ${{ vars.VERNOUILLET_REF }}
           LAZARE_REF: ${{ vars.LAZARE_REF }}
           COLLECT_FROM: "05:30"
           COLLECT_TO: "10:00"
-        run: cd "$DIR" && python collect.py
-      - name: Enregistrer
+        run: python collect.py
+      - name: Enregistrer sur la branche releves
+        working-directory: ${{ runner.temp }}/store
         run: |
-          cd "$DIR"
           git config user.name "collecteur-ligne-j"
           git config user.email "collecteur@users.noreply.github.com"
           mkdir -p data && git add data
           if git diff --cached --quiet; then echo "Rien de neuf"; exit 0; fi
-          git commit -m "Relevé $(date -u +%Y-%m-%dT%H:%MZ)"
-          for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done
+          git commit -q -m "Relevé $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do
+            if git push -q origin releves; then echo "Relevé enregistré"; exit 0; fi
+            git pull -q --rebase origin releves || true
+            sleep 5
+          done
+          echo "Échec de l'envoi sur la branche releves"; exit 1
