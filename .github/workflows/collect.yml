@@ -25,7 +25,7 @@ jobs:
         env:
           REPO_URL: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}
         run: |
-          f=$(find . -name collect.py -not -path './.git/*' | head -1)
+          f=$(find "$PWD" -name collect.py -not -path '*/.git/*' | head -1)
           if [ -z "$f" ]; then echo "collect.py introuvable dans le dépôt"; exit 1; fi
           if git ls-remote --exit-code --heads "$REPO_URL" releves >/dev/null; then
             git clone -q --depth 1 -b releves "$REPO_URL" "$RUNNER_TEMP/store"
