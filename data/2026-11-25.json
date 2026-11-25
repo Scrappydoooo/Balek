@@ -1,8 +1,44 @@
 {
  "date": "2026-11-25",
- "trains": [],
+ "trains": [
+  {
+   "key": "R130883",
+   "first_seen": "21:30",
+   "dir": "retour",
+   "num": "130883",
+   "ref": "SNCF_MAGENTA_PRD:VehicleJourney::74257353-61cd-4c01-b107-a21593091275:LOC",
+   "mission": "MALA",
+   "dest": "Mantes-la-Jolie",
+   "arr_t": "21:46",
+   "arr_exp": "21:46",
+   "arr_delay": 0,
+   "arr_status": "ontime",
+   "cancelled": false,
+   "last_seen": "21:30"
+  },
+  {
+   "key": "R130887",
+   "first_seen": "21:30",
+   "dir": "retour",
+   "num": "130887",
+   "ref": "SNCF_MAGENTA_PRD:VehicleJourney::567ddd01-dbdc-413f-bd3e-4ff472b6f3dc:LOC",
+   "mission": "MALA",
+   "dest": "Mantes-la-Jolie",
+   "arr_t": "22:16",
+   "arr_exp": "22:16",
+   "arr_delay": 0,
+   "arr_status": "ontime",
+   "cancelled": false,
+   "last_seen": "21:30",
+   "t": "21:47",
+   "dep_exp": "21:47",
+   "dep_delay": 0,
+   "dep_status": "ontime",
+   "dep_seen": "21:30"
+  }
+ ],
  "messages": [],
- "updated": "2026-11-25T21:22+01:00",
+ "updated": "2026-11-25T21:30+01:00",
  "stops": {
   "vernouillet": "STIF:StopArea:SP:47964:",
   "lazare": "STIF:StopArea:SP:58566:"
