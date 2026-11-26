@@ -1,9 +1,14 @@
 name: Collecte ligne J
 
+# GitHub lance mal les tâches programmées fréquentes : un lancement toutes les
+# 5 minutes devient souvent un toutes les 3 heures. Ici, chaque lancement reste
+# donc actif et relève les trains toutes les 3 minutes jusqu'à la fin de la
+# plage (matin 5 h - 10 h 30, soir 15 h - 23 h, heure de Paris). Il suffit
+# qu'un seul des déclenchements ci-dessous passe pour couvrir la suite.
 on:
   schedule:
-    - cron: "*/5 4-9 * * 1-5"
-    - cron: "*/5 13-21 * * 1-5"
+    - cron: "*/20 3-9 * * 1-5"
+    - cron: "*/20 13-21 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -16,7 +21,7 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,13 +34,13 @@ jobs:
           f=$(find "$PWD" -name collect.py -not -path '*/.git/*' | head -1)
           if [ -z "$f" ]; then echo "collect.py introuvable dans le dépôt"; exit 1; fi
           if git ls-remote --exit-code --heads "$REPO_URL" releves >/dev/null; then
-            git clone -q --depth 1 -b releves "$REPO_URL" "$RUNNER_TEMP/store"
+            git clone -q -b releves "$REPO_URL" "$RUNNER_TEMP/store"
           else
             mkdir -p "$RUNNER_TEMP/store" && cd "$RUNNER_TEMP/store"
             git init -q -b releves && git remote add origin "$REPO_URL"
           fi
           cp "$f" "$RUNNER_TEMP/store/collect.py"
-      - name: Relever les trains
+      - name: Relever les trains en continu
         working-directory: ${{ runner.temp }}/store
         env:
           PRIM_API_KEY: ${{ secrets.PRIM_API_KEY }}
@@ -43,18 +48,30 @@ jobs:
           LAZARE_REF: ${{ vars.LAZARE_REF }}
           COLLECT_FROM: "05:30"
           COLLECT_TO: "10:00"
-        run: python collect.py
-      - name: Enregistrer sur la branche releves
-        working-directory: ${{ runner.temp }}/store
         run: |
           git config user.name "collecteur-ligne-j"
           git config user.email "collecteur@users.noreply.github.com"
-          mkdir -p data && git add data
-          if git diff --cached --quiet; then echo "Rien de neuf"; exit 0; fi
-          git commit -q -m "Relevé $(date -u +%Y-%m-%dT%H:%MZ)"
-          for i in 1 2 3; do
-            if git push -q origin releves; then echo "Relevé enregistré"; exit 0; fi
-            git pull -q --rebase origin releves || true
-            sleep 5
+          echo "collect.py" > .git/info/exclude
+          in_window() {
+            local h=$((10#$(TZ=Europe/Paris date +%H%M)))
+            { [ $h -ge 500 ] && [ $h -lt 1030 ]; } || { [ $h -ge 1500 ] && [ $h -lt 2300 ]; }
+          }
+          save() {
+            mkdir -p data && git add data
+            git diff --cached --quiet && return 0
+            git commit -q -m "Relevé $(date -u +%Y-%m-%dT%H:%MZ)"
+            for i in 1 2 3; do
+              git push -q origin releves && return 0
+              git pull -q --rebase origin releves || true
+              sleep 5
+            done
+            echo "::warning::Échec de l'envoi sur la branche releves"
+          }
+          start=$(date +%s)
+          while true; do
+            python collect.py || echo "::warning::Relevé en échec, nouvel essai dans 3 minutes"
+            save
+            # Arrêt hors plage, ou avant la limite de 6 h imposée par GitHub
+            if ! in_window || [ $(( $(date +%s) - start )) -gt 19800 ]; then break; fi
+            sleep 180
           done
-          echo "Échec de l'envoi sur la branche releves"; exit 1
