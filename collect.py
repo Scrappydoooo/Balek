@@ -246,6 +246,9 @@ def main():
     if not DRY:
         DATA.mkdir(exist_ok=True)
         path.write_text(json.dumps(doc, ensure_ascii=False, indent=1))
+        # Liste des jours relevés, lue par la page web
+        dates = sorted(f.stem for f in DATA.glob("????-??-??.json"))
+        (DATA / "index.json").write_text(json.dumps({"dates": dates, "updated": doc["updated"]}))
 
 
 if __name__ == "__main__":
