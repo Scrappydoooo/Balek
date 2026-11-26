@@ -203,13 +203,13 @@
    "arr_delay": 1,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "17:31",
+   "last_seen": "17:34",
    "t": "17:24",
    "dep_exp": "17:24",
    "dep_delay": 0,
    "dep_status": "ontime",
    "dep_seen": "17:22",
-   "arr_lead": 17,
+   "arr_lead": 14,
    "dep_lead": 1
   },
   {
@@ -221,12 +221,12 @@
    "mission": "MALA",
    "dest": "Mantes-la-Jolie",
    "arr_t": "17:27",
-   "arr_exp": "17:33",
-   "arr_delay": 6,
-   "arr_status": "ontime",
+   "arr_exp": "17:34",
+   "arr_delay": 7,
+   "arr_status": "arrived",
    "cancelled": false,
-   "last_seen": "17:31",
-   "arr_lead": 2
+   "last_seen": "17:34",
+   "arr_lead": -1
   },
   {
    "key": "R130843",
@@ -241,14 +241,14 @@
    "arr_delay": 0,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "17:31",
+   "last_seen": "17:34",
    "t": "17:44",
    "dep_exp": "17:44",
    "dep_delay": 0,
    "dep_status": "ontime",
-   "dep_seen": "17:31",
-   "arr_lead": 37,
-   "dep_lead": 12
+   "dep_seen": "17:34",
+   "arr_lead": 34,
+   "dep_lead": 9
   },
   {
    "key": "R130847",
@@ -263,14 +263,14 @@
    "arr_delay": 0,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "17:31",
+   "last_seen": "17:34",
    "t": "18:05",
    "dep_exp": "18:05",
    "dep_delay": 0,
    "dep_status": "ontime",
-   "dep_seen": "17:31",
-   "arr_lead": 57,
-   "dep_lead": 33
+   "dep_seen": "17:34",
+   "arr_lead": 54,
+   "dep_lead": 30
   },
   {
    "key": "R130855",
@@ -285,14 +285,14 @@
    "arr_delay": 0,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "17:31",
+   "last_seen": "17:34",
    "t": "18:26",
    "dep_exp": "18:26",
    "dep_delay": 0,
    "dep_status": "ontime",
-   "dep_seen": "17:31",
-   "arr_lead": 78,
-   "dep_lead": 54
+   "dep_seen": "17:34",
+   "arr_lead": 75,
+   "dep_lead": 51
   },
   {
    "key": "R130859",
@@ -307,14 +307,14 @@
    "arr_delay": 0,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "17:31",
+   "last_seen": "17:34",
    "t": "18:44",
    "dep_exp": "18:44",
    "dep_delay": 0,
    "dep_status": "ontime",
-   "dep_seen": "17:31",
-   "arr_lead": 96,
-   "dep_lead": 72
+   "dep_seen": "17:34",
+   "arr_lead": 93,
+   "dep_lead": 69
   },
   {
    "key": "R130863",
@@ -329,14 +329,14 @@
    "arr_delay": 0,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "17:31",
+   "last_seen": "17:34",
    "t": "19:02",
    "dep_exp": "19:02",
    "dep_delay": 0,
    "dep_status": "ontime",
-   "dep_seen": "17:31",
-   "arr_lead": 117,
-   "dep_lead": 90
+   "dep_seen": "17:34",
+   "arr_lead": 114,
+   "dep_lead": 87
   },
   {
    "key": "R130869",
@@ -351,18 +351,18 @@
    "arr_delay": 0,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "17:31",
+   "last_seen": "17:34",
    "t": "19:25",
    "dep_exp": "19:25",
    "dep_delay": 0,
    "dep_status": "ontime",
-   "dep_seen": "17:31",
-   "arr_lead": 138,
-   "dep_lead": 113
+   "dep_seen": "17:34",
+   "arr_lead": 135,
+   "dep_lead": 110
   }
  ],
  "messages": [],
- "updated": "2026-11-26T17:31+01:00",
+ "updated": "2026-11-26T17:34+01:00",
  "stops": {
   "vernouillet": "STIF:StopArea:SP:47964:",
   "lazare": "STIF:StopArea:SP:58566:"
