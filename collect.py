@@ -193,10 +193,17 @@ def main():
     idx = lambda lst: ({t["num"]: t for t in lst if t.get("num")}, {t["ref"]: t for t in lst if t.get("ref")})
     a_num, a_ref = idx(aller)
     r_num, r_ref = idx(retour)
+    def quai(t, call, first, second):
+        """Voie a Saint-Lazare : on garde la derniere voie annoncee."""
+        q = val(call.get(first)) or val(call.get(second))
+        if q:
+            t["quai"] = str(q).strip()[:12]
+
     for v in laz:
         mvj, call, num, dvj = journey(v)
         t = a_num.get(num) or a_ref.get(dvj)
         if t:
+            quai(t, call, "ArrivalPlatformName", "DeparturePlatformName")
             a_aim = parse_t(call.get("AimedArrivalTime"))
             a_exp = parse_t(call.get("ExpectedArrivalTime"))
             st = (call.get("ArrivalStatus") or "").lower()
@@ -207,6 +214,7 @@ def main():
             continue
         t = r_num.get(num) or r_ref.get(dvj)
         if t:
+            quai(t, call, "DeparturePlatformName", "ArrivalPlatformName")
             d_aim = parse_t(call.get("AimedDepartureTime"))
             d_exp = parse_t(call.get("ExpectedDepartureTime"))
             st = (call.get("DepartureStatus") or "").lower()
