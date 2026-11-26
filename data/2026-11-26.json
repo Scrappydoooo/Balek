@@ -377,17 +377,17 @@
    "arr_t": "20:46",
    "arr_exp": "20:46",
    "arr_delay": 0,
-   "arr_lead": 45,
+   "arr_lead": 42,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "20:01",
+   "last_seen": "20:04",
    "quai": "unknown",
    "t": "20:17",
    "dep_exp": "20:17",
    "dep_delay": 0,
-   "dep_lead": 16,
+   "dep_lead": 13,
    "dep_status": "ontime",
-   "dep_seen": "20:01"
+   "dep_seen": "20:04"
   },
   {
    "key": "R130947",
@@ -400,17 +400,17 @@
    "arr_t": "21:16",
    "arr_exp": "21:16",
    "arr_delay": 0,
-   "arr_lead": 75,
+   "arr_lead": 72,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "20:01",
+   "last_seen": "20:04",
    "quai": "unknown",
    "t": "20:49",
    "dep_exp": "20:49",
    "dep_delay": 0,
-   "dep_lead": 48,
+   "dep_lead": 45,
    "dep_status": "ontime",
-   "dep_seen": "20:01"
+   "dep_seen": "20:04"
   },
   {
    "key": "R130883",
@@ -423,17 +423,17 @@
    "arr_t": "21:46",
    "arr_exp": "21:46",
    "arr_delay": 0,
-   "arr_lead": 105,
+   "arr_lead": 102,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "20:01",
+   "last_seen": "20:04",
    "quai": "unknown",
    "t": "21:17",
    "dep_exp": "21:17",
    "dep_delay": 0,
-   "dep_lead": 76,
+   "dep_lead": 73,
    "dep_status": "ontime",
-   "dep_seen": "20:01"
+   "dep_seen": "20:04"
   },
   {
    "key": "R130887",
@@ -446,21 +446,21 @@
    "arr_t": "22:16",
    "arr_exp": "22:16",
    "arr_delay": 0,
-   "arr_lead": 135,
+   "arr_lead": 132,
    "arr_status": "ontime",
    "cancelled": false,
-   "last_seen": "20:01",
+   "last_seen": "20:04",
    "quai": "unknown",
    "t": "21:47",
    "dep_exp": "21:47",
    "dep_delay": 0,
-   "dep_lead": 106,
+   "dep_lead": 103,
    "dep_status": "ontime",
-   "dep_seen": "20:01"
+   "dep_seen": "20:04"
   }
  ],
  "messages": [],
- "updated": "2026-11-26T20:01+01:00",
+ "updated": "2026-11-26T20:04+01:00",
  "stops": {
   "vernouillet": "STIF:StopArea:SP:47964:",
   "lazare": "STIF:StopArea:SP:58566:"
