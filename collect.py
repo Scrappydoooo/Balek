@@ -172,7 +172,7 @@ def main():
             key = num or dvj or f"{hm(aimed)}-{mission}"
             t = trains.setdefault(key, {"key": key, "first_seen": hm(now)})
             t.update({"dir": "aller", "num": num, "ref": dvj, "t": hm(aimed), "mission": mission,
-                      "dep_exp": hm(exp), "dep_delay": mins(aimed, exp),
+                      "dep_exp": hm(exp), "dep_delay": mins(aimed, exp), "dep_lead": mins(now, exp or aimed),
                       "cancelled": sticky(t, status), "dep_status": status, "last_seen": hm(now)})
         else:
             aimed = parse_t(call.get("AimedArrivalTime")) or parse_t(call.get("AimedDepartureTime"))
@@ -184,6 +184,7 @@ def main():
             t = trains.setdefault(key, {"key": key, "first_seen": hm(now)})
             t.update({"dir": "retour", "num": num, "ref": dvj, "mission": mission, "dest": dest[:40],
                       "arr_t": hm(aimed), "arr_exp": hm(exp), "arr_delay": mins(aimed, exp),
+                      "arr_lead": mins(now, exp or aimed),
                       "arr_status": status, "cancelled": sticky(t, status), "last_seen": hm(now)})
 
     # 2. A Saint-Lazare : arrivee des trains du matin, depart des trains du soir
@@ -200,7 +201,7 @@ def main():
             a_exp = parse_t(call.get("ExpectedArrivalTime"))
             st = (call.get("ArrivalStatus") or "").lower()
             t.update({"arr_t": hm(a_aim), "arr_exp": hm(a_exp), "arr_delay": mins(a_aim, a_exp),
-                      "arr_status": st, "arr_seen": hm(now)})
+                      "arr_lead": mins(now, a_exp or a_aim), "arr_status": st, "arr_seen": hm(now)})
             if st == "cancelled":
                 t["cancelled"] = True
             continue
@@ -210,7 +211,7 @@ def main():
             d_exp = parse_t(call.get("ExpectedDepartureTime"))
             st = (call.get("DepartureStatus") or "").lower()
             t.update({"t": hm(d_aim), "dep_exp": hm(d_exp), "dep_delay": mins(d_aim, d_exp),
-                      "dep_status": st, "dep_seen": hm(now)})
+                      "dep_lead": mins(now, d_exp or d_aim), "dep_status": st, "dep_seen": hm(now)})
             if st == "cancelled":
                 t["cancelled"] = True
 
