@@ -229,7 +229,11 @@ renderAuto();
 
 ['w1','w2'].forEach(id=>$(id).addEventListener('change',()=>{WIN[mode]=[$('w1').value,$('w2').value];try{localStorage.setItem('lj-win2',JSON.stringify(WIN))}catch(e){}renderAuto()}));
 document.querySelectorAll('#modes button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.m;try{localStorage.setItem('lj-mode',mode)}catch(e){}setWinInputs();sel=null;renderAuto()}));
-const BASE='https://raw.githubusercontent.com/Scrappydoooo/Balek/releves/data/';
+/* Adresse des relevés déduite de celle de la page (utilisateur.github.io/depot/),
+   pour que la page continue de marcher si le dépôt est renommé. */
+const GH=(()=>{const u=location.hostname.match(/^([^.]+)\.github\.io$/i),r=location.pathname.split('/').filter(Boolean)[0];
+ return u&&r?{user:u[1],repo:r}:{user:'Scrappydoooo',repo:'Balek'}})();
+const BASE='https://raw.githubusercontent.com/'+encodeURIComponent(GH.user)+'/'+encodeURIComponent(GH.repo)+'/releves/data/';
 const today=()=>new Date().toLocaleDateString('fr-CA',{timeZone:'Europe/Paris'});
 const cache={};
 try{Object.assign(cache,JSON.parse(localStorage.getItem('lj-days')||'{}'))}catch(e){}
