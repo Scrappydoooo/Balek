@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mes trains ligne J</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* VOICE: sobre, factuel, comme un bulletin d'info voyageurs
+   IDEA: le tableau d'affichage en gare et la fiche horaire de la ligne J
+   PICTURE: une barre par mois sur l'échelle de ponctualité, mois "à problème" en rouge
+   COLOUR and TYPE: jaune-olive de la ligne J, encre noire, rouge "supprimé"; Barlow Condensed / Barlow
+   LAYOUT: bandeau jaune titre + chiffres clés, graphique pleine largeur, chronologie à heures pendantes, sources */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#121310);--ink:light-dark(#15160f,#f1f0e6);--mut:light-dark(#5d5f52,#a9aa9a);
+--j:#d4c600;--jd:light-dark(#d4c600,#bfb300);--jink:#15160f;--red:light-dark(#c8102e,#ff5a6e);
+--line:light-dark(#e3e2d6,#2c2d26);--soft:light-dark(#f6f5ea,#1c1d17)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Barlow,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(28px,4vw,64px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+h1,h2,.big{font-family:"Barlow Condensed",Barlow,sans-serif;font-weight:700;line-height:1.05;text-wrap:balance;margin:0}
+h1{font-size:clamp(32px,5vw,52px)}h2{font-size:32px;margin-bottom:8px}
+.hero{background:var(--jd);color:var(--jink)}
+.tag{display:inline-flex;align-items:center;gap:10px;font-weight:600;margin-bottom:14px}
+.tag b{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:8px;background:var(--jink);color:#d4c600;font:700 26px "Barlow Condensed",sans-serif}
+.hero p{max-width:68ch;margin:14px 0 0;font-size:17px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:2px;margin-top:28px;background:var(--jink);border:2px solid var(--jink);border-radius:10px;overflow:hidden}
+.kpi{background:var(--jd);padding:16px 18px}
+.kpi .big{font-size:clamp(34px,4.4vw,48px);white-space:nowrap}
+.kpi span{display:block;font-size:14px;line-height:1.35}
+.lede{color:var(--mut);max-width:70ch;margin:0 0 22px}
+.chart{border-top:2px solid var(--ink)}
+.row{display:grid;grid-template-columns:5.2em minmax(0,1fr) 12em;gap:14px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.m{font-weight:600}
+.track{position:relative;height:26px;background:var(--soft);border-radius:4px}
+.bar{position:absolute;inset:0 auto 0 0;background:var(--ink);border-radius:4px;transform-origin:left;animation:g .8s ease-out both}
+.bad .bar{background:var(--red)}
+.na .track{background:repeating-linear-gradient(-45deg,var(--soft) 0 6px,transparent 6px 12px);border:1px dashed var(--line)}
+.ref{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--j)}
+.v{font-variant-numeric:tabular-nums;font-size:15px}.v b{font-size:18px;white-space:nowrap}.v small{display:block;color:var(--mut);font-size:13px;line-height:1.3}
+.bad .v b{color:var(--red)}
+.axis{display:grid;grid-template-columns:5.2em minmax(0,1fr) 12em;gap:14px;font-size:13px;color:var(--mut);padding-top:6px}
+.axis div{display:flex;justify-content:space-between}
+@keyframes g{from{transform:scaleX(0)}}
+@media(prefers-reduced-motion:reduce){.bar{animation:none}}
+.note{font-size:14px;color:var(--mut);max-width:80ch;margin-top:14px}
+.tl{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
+.tl li{display:grid;grid-template-columns:9.5em minmax(0,1fr);gap:18px;padding:14px 0;border-bottom:1px solid var(--line)}
+.tl time{font:700 20px/1.2 "Barlow Condensed",sans-serif;white-space:nowrap}
+.tl h3{margin:0 0 2px;font-size:17px}
+.tl p{margin:0;color:var(--mut);max-width:72ch}
+.pill{display:inline-block;font-size:13px;font-weight:600;padding:1px 8px;border-radius:99px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+.cut{background:var(--red);color:#fff}.sup{background:var(--j);color:var(--jink)}.inc{border:1px solid var(--mut);color:var(--mut)}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}
+.filters button{font:600 15px Barlow,sans-serif;min-height:44px;padding:0 16px;border-radius:99px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.filters button:focus-visible{outline:3px solid var(--j);outline-offset:2px}
+.soft{background:var(--soft)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:28px}
+.cols h3{margin:0 0 6px;font-size:18px}.cols p{margin:0 0 10px}
+.src{font-size:14px;columns:2 320px;padding-left:18px}.src li{margin-bottom:6px;break-inside:avoid}
+a{color:inherit;text-decoration-color:var(--j);text-decoration-thickness:2px;text-underline-offset:3px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;margin-bottom:12px}.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:6px;vertical-align:-2px}
+.q1{background:var(--bg);border:1px solid var(--line)}.q2{background:light-dark(#efe9a0,#4a4613)}.q3{background:light-dark(#f4b8bf,#5c1c25)}.we{background:var(--bg);border:1px dashed var(--mut)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal .h{font-size:13px;color:var(--mut);text-align:center}
+.d{border-radius:6px;padding:8px 9px;min-height:78px;border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.d.w{border-style:dashed}
+.d .n{font-size:13px;color:var(--mut)}.d .p{font:700 22px/1.1 "Barlow Condensed",sans-serif}.d .s{font-size:13px}
+.d.q3 .s{color:var(--red);font-weight:600}
+.pt{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px;margin-bottom:24px}
+.card{display:grid;gap:12px;padding:18px;border:2px solid var(--ink);border-radius:10px}
+.card label{display:grid;gap:4px;font-weight:600;font-size:15px}
+.card fieldset{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px}.card legend{font-weight:600;font-size:15px;margin-bottom:4px}
+.card .r{display:flex;align-items:center;gap:6px;font-weight:500;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:8px}
+input[type=date],input[type=time],input[type=number],input[type=text]{font:16px Barlow,sans-serif;min-height:44px;padding:0 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+input:focus-visible,button:focus-visible{outline:3px solid var(--j);outline-offset:2px}
+.go,.ghost,.del{font:600 15px Barlow,sans-serif;min-height:44px;border-radius:8px;cursor:pointer}
+.go{background:var(--ink);color:var(--bg);border:0}.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink);padding:0 16px}
+.del{background:transparent;border:0;color:var(--mut);min-width:44px}
+.msg{margin:0;font-size:14px;color:var(--mut);min-height:1.2em}
+.win{font-weight:600;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:2px;background:var(--ink);border:2px solid var(--ink);border-radius:10px;overflow:hidden}
+.st{background:var(--bg);padding:14px 16px}.st .big{font-size:clamp(30px,4vw,42px)}.st span{display:block;font-size:14px;color:var(--mut)}
+.st.hl{background:var(--jd);color:var(--jink)}.st.hl span{color:var(--jink)}
+.dayl{display:flex;flex-wrap:wrap;gap:4px;margin-top:14px}
+.dayl b{display:grid;place-items:center;width:44px;height:44px;border-radius:6px;font-size:13px;border:1px solid var(--line)}
+.acts{margin-top:14px}
+.log{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.log th,.log td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}.log th{border-bottom:2px solid var(--ink);font-size:14px}
+.log .sup{color:var(--red);font-weight:600;background:none}
+.empty{color:var(--mut);padding:16px 0}
+.sub{font-size:21px;margin:32px 0 10px}
+#auto .stats{margin-top:4px}
+.days{display:flex;gap:4px;height:170px;overflow-x:auto;padding:0 0 2px;border-bottom:2px solid var(--ink)}
+.days button{flex:0 0 38px;display:flex;flex-direction:column;align-items:stretch;gap:4px;border:0;background:transparent;cursor:pointer;padding:0;color:var(--mut);font:600 12px Barlow,sans-serif}
+.days .bw{flex:1;position:relative;background:var(--soft);border-radius:4px}
+.days .b{position:absolute;left:0;right:0;bottom:0;background:var(--ink);border-radius:4px}
+.days .bad .b{background:var(--red)}
+.days .pc{font-size:12px;color:var(--ink);text-align:center}
+.days button[aria-pressed=true] .bw{outline:3px solid var(--j);outline-offset:1px}
+.days button[aria-pressed=true]{color:var(--ink)}
+.det{margin-top:18px;padding:16px 18px;border:2px solid var(--ink);border-radius:10px}
+.det h4{margin:0 0 6px;font-size:18px}
+.det ul{margin:6px 0 12px;padding-left:18px;color:var(--mut);font-size:14px}
+.tag2{display:inline-block;font-size:13px;font-weight:600;padding:1px 8px;border-radius:99px;white-space:nowrap}
+.t-ok{border:1px solid var(--line)}.t-late{background:light-dark(#efe9a0,#4a4613)}.t-ko{background:var(--red);color:#fff}
+.log td.n,.log th.n{text-align:right}
+.manual{margin-top:32px;border-top:1px solid var(--line);padding-top:8px}
+.manual summary{cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center}
+.wait{padding:22px;border:2px dashed var(--line);border-radius:10px;color:var(--mut);max-width:70ch}
+@media(max-width:760px){.pt{grid-template-columns:1fr}}
+@media(max-width:600px){.d{min-height:62px;padding:5px}.d .p{font-size:17px}.d .s{font-size:12px}.cal{gap:3px}}
+@media(max-width:600px){.row,.axis{grid-template-columns:3.6em minmax(0,1fr) 7.6em;gap:10px}.v small{display:none}.tl li{grid-template-columns:1fr;gap:4px}}
+</style>
+</head>
+<body>
+
+<header class="band hero">
+ <div class="wrap">
+  <div class="tag"><b>J</b> Vernouillet-Verneuil ⇄ Paris Saint-Lazare</div>
+  <h1>Mes trains de la ligne J, relevés chaque jour</h1>
+  <p>Le matin vers Paris, le soir vers Vernouillet. Chaque jour de semaine, les trains sont relevés toutes les 3 minutes dans le temps réel d'Île-de-France Mobilités, et cette page se recharge toute seule.</p>
+ </div>
+</header>
+
+<section class="band" id="auto">
+ <div class="wrap">
+  <h2>Ponctualité de vos trains</h2>
+  <p class="lede">Chaque jour de semaine, les trains sont relevés le matin de Vernouillet-Verneuil vers Paris Saint-Lazare, et le soir de Saint-Lazare vers Vernouillet-Verneuil : heure prévue, heure réelle au départ et à l'arrivée, suppressions. Un train est à l'heure s'il arrive à destination avec moins de 5 minutes de retard. Si l'arrivée n'a pas été captée, c'est le retard au départ qui compte.</p>
+  <div class="filters" id="modes" role="group" aria-label="Trajet">
+   <button type="button" data-m="matin" aria-pressed="true">Matin : Vernouillet → Paris</button>
+   <button type="button" data-m="soir" aria-pressed="false">Soir : Paris → Vernouillet</button>
+  </div>
+  <div class="win">Plage horaire : <input type="time" id="w1" value="06:30" aria-label="Début de la plage"> à <input type="time" id="w2" value="09:30" aria-label="Fin de la plage"></div>
+  <div class="stats" id="akpi"></div>
+  <p class="msg" id="amsg" role="status"></p>
+  <div id="abody">
+   <h3 class="sub">Jour par jour</h3>
+   <div class="days" id="adays" role="list"></div>
+   <div id="adet"></div>
+   <h3 class="sub">Train par train</h3>
+   <p class="note" style="margin-top:0">Quels départs sont les plus fiables. « Absent » : le train fait partie de la grille habituelle mais n'a pas circulé ce jour-là, en général parce qu'il a été supprimé la veille.</p>
+   <div class="scroll"><table class="log" id="aslots"></table></div>
+  </div>
+ </div>
+</section>
+
+<footer class="band soft">
+ <div class="wrap">
+  <p class="note" style="margin-top:0">Source : API « Prochains passages » de PRIM (Île-de-France Mobilités), relevée par le collecteur de ce dépôt GitHub. Les trains supprimés la veille n'apparaissent pas dans le temps réel : ils sont comptés comme « absents » quand ils manquent par rapport à la grille habituelle, une fois qu'il y a au moins 5 jours de relevés.</p>
+ </div>
+</footer>
+
+<script>
+{
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isWeekday=ds=>{const g=new Date(ds+'T12:00:00').getDay();return g>0&&g<6};
+const fmtD=ds=>new Date(ds+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+const WIN={matin:['06:30','09:30'],soir:['16:00','22:00']};let mode='matin';
+try{const w=JSON.parse(localStorage.getItem('lj-win2')||'null');if(w&&w.matin&&w.soir){WIN.matin=w.matin;WIN.soir=w.soir}if(localStorage.getItem('lj-mode')==='soir')mode='soir'}catch(e){}
+const setWinInputs=()=>{$('w1').value=WIN[mode][0];$('w2').value=WIN[mode][1];document.querySelectorAll('#modes button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===mode))};
+setWinInputs();
+/* ===== relevé automatique ===== */
+let jours=[],sel=null;
+const isNum=x=>typeof x==='number'&&isFinite(x);
+/* Un retard n'est retenu que s'il a été relevé moins de 15 min avant le passage :
+   plus tôt, l'API annonce presque toujours « à l'heure ». Un retard de 5 min ou plus
+   annoncé plus tôt est gardé : le train ne le rattrape quasiment jamais. */
+const fresh=(d,l)=>isNum(d)&&(d>=5||(isNum(l)&&l<=15));
+const delayOf=t=>fresh(t.arr_delay,t.arr_lead)?t.arr_delay:fresh(t.dep_delay,t.dep_lead)?t.dep_delay:null;
+const okT=t=>!t.cancelled&&delayOf(t)!=null&&delayOf(t)<5;
+const hmOk=s=>typeof s==='string'&&/^\d{2}:\d{2}$/.test(s);
+function cleanDay(d){
+ if(!d||!/^\d{4}-\d{2}-\d{2}$/.test(d.date)||!Array.isArray(d.trains))return null;
+ const trains=d.trains.filter(t=>t&&(hmOk(t.t)||(t.dir==='retour'&&hmOk(t.arr_t)))).map(t=>({dir:t.dir==='retour'?'retour':'aller',est:!hmOk(t.t),t:hmOk(t.t)?t.t:t.arr_t,mission:String(t.mission||'').slice(0,8),num:String(t.num||'').slice(0,12),
+  dep_exp:hmOk(t.dep_exp)?t.dep_exp:null,dep_delay:isNum(t.dep_delay)?t.dep_delay:null,
+  arr_t:hmOk(t.arr_t)?t.arr_t:null,arr_exp:hmOk(t.arr_exp)?t.arr_exp:null,arr_delay:isNum(t.arr_delay)?t.arr_delay:null,arr_lead:isNum(t.arr_lead)?t.arr_lead:null,dep_lead:isNum(t.dep_lead)?t.dep_lead:null,quai:typeof t.quai==='string'?t.quai.slice(0,12):'',cancelled:t.cancelled===true}));
+ return {date:d.date,trains,messages:Array.isArray(d.messages)?d.messages.filter(m=>typeof m==='string').slice(0,10):[],updated:String(d.updated||'')};
+}
+const inW=t=>t>=$('w1').value&&t<=$('w2').value;
+function renderAuto(){
+ const dir=mode==='soir'?'retour':'aller';
+ const days=jours.filter(d=>isWeekday(d.date)).map(d=>Object.assign({},d,{trains:d.trains.filter(t=>t.dir===dir)})).filter(d=>d.trains.length).sort((a,b)=>a.date.localeCompare(b.date));
+ if(!days.length){
+  $('akpi').innerHTML='';$('abody').innerHTML='<div class="wait">Pas encore de relevé pour '+(mode==='soir'?'le soir':'le matin')+'. Les trains apparaissent ici au fil des relevés, de 5 h à 10 h 30 et de 15 h à 23 h en semaine.</div>';
+  return;
+ }
+ /* grille habituelle : départs vus au moins un jour sur deux, à partir de 5 jours de relevés */
+ const cnt={};days.forEach(d=>new Set(d.trains.filter(t=>!t.est).map(t=>t.t)).forEach(t=>cnt[t]=(cnt[t]||0)+1));
+ const grid=days.length>=5?Object.keys(cnt).filter(t=>cnt[t]>=days.length/2&&inW(t)):[];
+ const stat=d=>{const tr=d.trains.filter(t=>inW(t.t));const seen=new Set(tr.map(t=>t.t));
+  const abs=grid.filter(t=>!seen.has(t));const known=tr.filter(t=>t.cancelled||delayOf(t)!=null);
+  const ok=known.filter(okT).length;const sup=tr.filter(t=>t.cancelled).length;
+  const n=known.length+abs.length;return {tr,abs,ok,sup,n,pct:n?Math.round(ok/n*100):null}};
+ const S=days.map(d=>Object.assign({d},stat(d)));
+ const tot=S.reduce((a,s)=>({ok:a.ok+s.ok,n:a.n+s.n,sup:a.sup+s.sup,abs:a.abs+s.abs.length}),{ok:0,n:0,sup:0,abs:0});
+ const lates=S.flatMap(s=>s.tr.filter(t=>!t.cancelled&&delayOf(t)>=5).map(delayOf));
+ const last=S[S.length-1];
+ $('akpi').innerHTML=`<div class="st hl"><div class="big">${tot.n?Math.round(tot.ok/tot.n*100)+' %':'–'}</div><span>à l'heure ${mode==='soir'?'le soir':'le matin'} sur la plage choisie (${S.length} j)</span></div>
+ <div class="st"><div class="big">${last.pct!=null?last.pct+' %':'–'}</div><span>dernier jour relevé (${esc(fmtD(last.d.date))})</span></div>
+ <div class="st"><div class="big">${tot.sup+tot.abs}</div><span>trains supprimés ou absents</span></div>
+ <div class="st"><div class="big">${lates.length?Math.round(lates.reduce((a,b)=>a+b,0)/lates.length)+' min':'–'}</div><span>retard moyen des trains en retard</span></div>`;
+ if(!$('adays')){$('abody').innerHTML='<h3 class="sub">Jour par jour</h3><div class="days" id="adays" role="list"></div><div id="adet"></div><h3 class="sub">Train par train</h3><p class="note" style="margin-top:0">Quels départs sont les plus fiables. « Absent » : le train fait partie de la grille habituelle mais n\'a pas circulé ce jour-là, en général parce qu\'il a été supprimé la veille.</p><div class="scroll"><table class="log" id="aslots"></table></div>'}
+ if(!sel||!S.some(s=>s.d.date===sel))sel=last.d.date;
+ $('adays').innerHTML=S.slice(-60).map(s=>`<button type="button" role="listitem" data-d="${esc(s.d.date)}" aria-pressed="${s.d.date===sel}" class="${s.pct!=null&&s.pct<90?'bad':''}" aria-label="${esc(fmtD(s.d.date))} : ${s.pct==null?'pas de donnée':s.pct+' % à l\'heure'}"><span class="pc">${s.pct==null?'–':s.pct}</span><span class="bw"><span class="b" style="height:${s.pct||0}%"></span></span><span>${esc(s.d.date.slice(8))}/${esc(s.d.date.slice(5,7))}</span></button>`).join('');
+ const sd=S.find(s=>s.d.date===sel);
+ const rows=sd.tr.map(t=>({t,abs:false})).concat(sd.abs.map(a=>({t:{t:a},abs:true}))).sort((a,b)=>a.t.t.localeCompare(b.t.t));
+ const etat=r=>r.abs?'<span class="tag2 t-ko">Absent</span>':r.t.cancelled?'<span class="tag2 t-ko">Supprimé</span>':delayOf(r.t)==null?'<span class="tag2 t-ok">Non mesuré</span>':delayOf(r.t)>=5?`<span class="tag2 t-late">+${delayOf(r.t)} min</span>`:'<span class="tag2 t-ok">À l\'heure</span>';
+ $('adet').innerHTML=`<div class="det"><h4>${esc(new Date(sd.d.date+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}))} : ${sd.pct==null?'pas de donnée exploitable':sd.ok+(sd.ok>1?' trains':' train')+' à l\'heure sur '+sd.n}</h4>
+ ${sd.d.messages.length?'<ul>'+sd.d.messages.map(m=>`<li>${esc(m)}</li>`).join('')+'</ul>':''}
+ <div class="scroll"><table class="log"><thead><tr><th>${mode==='soir'?'Départ St-Lazare':'Départ Vernouillet'}</th><th>Mission</th><th>Voie St-Lazare</th><th class="n">Départ réel</th><th class="n">${mode==='soir'?'Arrivée Vernouillet':'Arrivée St-Lazare'}</th><th>État</th></tr></thead><tbody>
+ ${rows.length?rows.map(r=>`<tr><td>${r.t.est?'arr. ':''}${esc(r.t.t)}</td><td>${esc(r.t.mission||'')}</td><td>${esc(r.t.quai||'')}</td><td class="n">${esc(r.t.dep_exp||'')}</td><td class="n">${r.t.arr_t?esc(r.t.arr_t)+(r.t.arr_exp&&r.t.arr_exp!==r.t.arr_t?' → '+esc(r.t.arr_exp):''):''}</td><td>${etat(r)}</td></tr>`).join(''):'<tr><td colspan="6" class="empty">Aucun train relevé dans cette plage.</td></tr>'}
+ </tbody></table></div></div>`;
+ /* par créneau */
+ const slots={};S.forEach(s=>{s.tr.filter(t=>!t.est).forEach(t=>{const o=slots[t.t]=slots[t.t]||{n:0,ok:0,sup:0,abs:0,del:[],q:{}};o.n++;if(t.quai)o.q[t.quai]=(o.q[t.quai]||0)+1;if(t.cancelled)o.sup++;else if(okT(t))o.ok++;if(!t.cancelled&&delayOf(t)!=null)o.del.push(delayOf(t))});
+  s.abs.forEach(a=>{const o=slots[a]=slots[a]||{n:0,ok:0,sup:0,abs:0,del:[],q:{}};o.abs++})});
+ const keys=Object.keys(slots).filter(inW).sort();
+ $('aslots').innerHTML='<thead><tr><th>Départ</th><th class="n">Jours</th><th class="n">À l\'heure</th><th class="n">Retard moyen</th><th class="n">Supprimé</th><th class="n">Absent</th><th>Voie habituelle</th></tr></thead><tbody>'+
+  (keys.length?keys.map(k=>{const o=slots[k],tot=o.n+o.abs,p=tot?Math.round(o.ok/tot*100):0,m=o.del.length?Math.round(o.del.reduce((a,b)=>a+b,0)/o.del.length):null;
+   return `<tr><td><b>${esc(k)}</b></td><td class="n">${tot}</td><td class="n">${p} %</td><td class="n">${m==null?'–':m+' min'}</td><td class="n">${o.sup||''}</td><td class="n">${o.abs||''}</td><td>${esc(Object.entries(o.q).sort((a,b)=>b[1]-a[1]).map(e=>e[0])[0]||'')}</td></tr>`}).join(''):'<tr><td colspan="7" class="empty">Aucun départ dans cette plage.</td></tr>')+'</tbody>';
+}
+$('abody').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(!b)return;sel=b.dataset.d;renderAuto()});
+renderAuto();
+
+['w1','w2'].forEach(id=>$(id).addEventListener('change',()=>{WIN[mode]=[$('w1').value,$('w2').value];try{localStorage.setItem('lj-win2',JSON.stringify(WIN))}catch(e){}renderAuto()}));
+document.querySelectorAll('#modes button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.m;try{localStorage.setItem('lj-mode',mode)}catch(e){}setWinInputs();sel=null;renderAuto()}));
+const BASE='https://raw.githubusercontent.com/Scrappydoooo/Balek/releves/data/';
+const today=()=>new Date().toLocaleDateString('fr-CA',{timeZone:'Europe/Paris'});
+const cache={};
+try{Object.assign(cache,JSON.parse(localStorage.getItem('lj-days')||'{}'))}catch(e){}
+let lastUpd='';
+async function getJSON(u){const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error(r.status);return r.json()}
+async function load(){
+ try{
+  const idx=await getJSON(BASE+'index.json?t='+Date.now());
+  const dates=Array.isArray(idx.dates)?idx.dates.filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)):[];
+  const td=today(),need=dates.filter(d=>!cache[d]||d>=td||cache[d]._partial);
+  await Promise.all(need.map(async d=>{try{const x=await getJSON(BASE+d+'.json?t='+Date.now());const c=cleanDay(x);if(c){c._partial=d>=td;cache[d]=c}}catch(e){}}));
+  try{const keep={};dates.forEach(d=>{if(cache[d]&&!cache[d]._partial)keep[d]=cache[d]});localStorage.setItem('lj-days',JSON.stringify(keep))}catch(e){}
+  jours=dates.map(d=>cache[d]).filter(Boolean);
+  lastUpd=typeof idx.updated==='string'?idx.updated:'';
+  showUpd();renderAuto();
+ }catch(e){$('amsg').textContent='Relevés injoignables pour le moment, nouvel essai dans 3 minutes.'}
+}
+function showUpd(){
+ if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(lastUpd)){$('amsg').textContent='';return}
+ const t=new Date(lastUpd),m=Math.round((Date.now()-t)/60000);
+ $('amsg').textContent='Dernier relevé : '+fmtD(lastUpd.slice(0,10))+' à '+lastUpd.slice(11,16)+(m>=0&&m<600?' (il y a '+m+' min)':'')+'. La page se met à jour toute seule.';
+}
+$('amsg').textContent='Chargement des relevés…';
+load();
+setInterval(load,180000);
+setInterval(showUpd,60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)load()});
+}
+</script>
+</body>
+</html>
