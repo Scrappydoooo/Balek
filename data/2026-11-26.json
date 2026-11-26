@@ -1,0 +1,82 @@
+{
+ "date": "2026-11-26",
+ "trains": [
+  {
+   "key": "130708",
+   "first_seen": "04:03",
+   "dir": "aller",
+   "num": "130708",
+   "ref": "SNCF_MAGENTA_PRD:VehicleJourney::9e72308d-91df-4103-9197-ed74fd413713:LOC",
+   "t": "05:46",
+   "mission": "PALE",
+   "dep_exp": "05:46",
+   "dep_delay": 0,
+   "cancelled": false,
+   "dep_status": "ontime",
+   "last_seen": "04:03",
+   "arr_t": "06:17",
+   "arr_exp": "06:17",
+   "arr_delay": 0,
+   "arr_status": "ontime",
+   "arr_seen": "04:03"
+  },
+  {
+   "key": "130710",
+   "first_seen": "04:03",
+   "dir": "aller",
+   "num": "130710",
+   "ref": "SNCF_MAGENTA_PRD:VehicleJourney::2c71ab5e-cbd6-4281-9f6c-0da0577b35b1:LOC",
+   "t": "06:08",
+   "mission": "PALE",
+   "dep_exp": "06:08",
+   "dep_delay": 0,
+   "cancelled": false,
+   "dep_status": "ontime",
+   "last_seen": "04:03",
+   "arr_t": "06:39",
+   "arr_exp": "06:39",
+   "arr_delay": 0,
+   "arr_status": "ontime",
+   "arr_seen": "04:03"
+  },
+  {
+   "key": "130714",
+   "first_seen": "04:03",
+   "dir": "aller",
+   "num": "130714",
+   "ref": "SNCF_MAGENTA_PRD:VehicleJourney::ca03cc56-da03-43a9-9f67-0757c20e5ba9:LOC",
+   "t": "06:25",
+   "mission": "PELE",
+   "dep_exp": "06:25",
+   "dep_delay": 0,
+   "cancelled": false,
+   "dep_status": "ontime",
+   "last_seen": "04:03",
+   "arr_t": "06:51",
+   "arr_exp": "06:51",
+   "arr_delay": 0,
+   "arr_status": "ontime",
+   "arr_seen": "04:03"
+  },
+  {
+   "key": "130720",
+   "first_seen": "04:03",
+   "dir": "aller",
+   "num": "130720",
+   "ref": "SNCF_MAGENTA_PRD:VehicleJourney::e90e7b83-5518-473b-849f-b2523ff8aaa8:LOC",
+   "t": "06:45",
+   "mission": "PALE",
+   "dep_exp": "06:45",
+   "dep_delay": 0,
+   "cancelled": false,
+   "dep_status": "ontime",
+   "last_seen": "04:03"
+  }
+ ],
+ "messages": [],
+ "updated": "2026-11-26T04:03+01:00",
+ "stops": {
+  "vernouillet": "STIF:StopArea:SP:47964:",
+  "lazare": "STIF:StopArea:SP:58566:"
+ }
+}
