@@ -55,21 +55,21 @@
    "mission": "POLO",
    "dep_exp": "09:45",
    "dep_delay": 0,
-   "dep_lead": 10,
+   "dep_lead": 7,
    "cancelled": false,
    "dep_status": "ontime",
-   "last_seen": "09:35",
+   "last_seen": "09:38",
    "quai": "unknown",
    "arr_t": "10:16",
-   "arr_exp": "10:16",
-   "arr_delay": 0,
-   "arr_lead": 41,
+   "arr_exp": "10:17",
+   "arr_delay": 1,
+   "arr_lead": 39,
    "arr_status": "ontime",
-   "arr_seen": "09:35"
+   "arr_seen": "09:38"
   }
  ],
  "messages": [],
- "updated": "2026-11-27T09:35+01:00",
+ "updated": "2026-11-27T09:38+01:00",
  "stops": {
   "vernouillet": "STIF:StopArea:SP:47964:",
   "lazare": "STIF:StopArea:SP:58566:"
