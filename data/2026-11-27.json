@@ -19,9 +19,9 @@
    "arr_t": "09:14",
    "arr_exp": "09:14",
    "arr_delay": 0,
-   "arr_lead": 24,
+   "arr_lead": 21,
    "arr_status": "ontime",
-   "arr_seen": "08:49"
+   "arr_seen": "08:52"
   },
   {
    "key": "130750",
@@ -33,17 +33,17 @@
    "mission": "PELE",
    "dep_exp": "09:06",
    "dep_delay": 0,
-   "dep_lead": 16,
+   "dep_lead": 13,
    "cancelled": false,
    "dep_status": "ontime",
-   "last_seen": "08:49",
+   "last_seen": "08:52",
    "quai": "unknown",
    "arr_t": "09:32",
    "arr_exp": "09:32",
    "arr_delay": 0,
-   "arr_lead": 42,
+   "arr_lead": 39,
    "arr_status": "ontime",
-   "arr_seen": "08:49"
+   "arr_seen": "08:52"
   },
   {
    "key": "130914",
@@ -55,21 +55,21 @@
    "mission": "POLO",
    "dep_exp": "09:45",
    "dep_delay": 0,
-   "dep_lead": 56,
+   "dep_lead": 52,
    "cancelled": false,
    "dep_status": "ontime",
-   "last_seen": "08:49",
+   "last_seen": "08:52",
    "quai": "unknown",
    "arr_t": "10:16",
    "arr_exp": "10:16",
    "arr_delay": 0,
-   "arr_lead": 86,
+   "arr_lead": 83,
    "arr_status": "ontime",
-   "arr_seen": "08:49"
+   "arr_seen": "08:52"
   }
  ],
  "messages": [],
- "updated": "2026-11-27T08:49+01:00",
+ "updated": "2026-11-27T08:52+01:00",
  "stops": {
   "vernouillet": "STIF:StopArea:SP:47964:",
   "lazare": "STIF:StopArea:SP:58566:"
