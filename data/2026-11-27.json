@@ -19,9 +19,9 @@
    "arr_t": "09:14",
    "arr_exp": "09:15",
    "arr_delay": 2,
-   "arr_lead": 5,
+   "arr_lead": 2,
    "arr_status": "ontime",
-   "arr_seen": "09:10"
+   "arr_seen": "09:14"
   },
   {
    "key": "130750",
@@ -39,11 +39,11 @@
    "last_seen": "09:04",
    "quai": "unknown",
    "arr_t": "09:32",
-   "arr_exp": "09:32",
-   "arr_delay": 0,
-   "arr_lead": 21,
+   "arr_exp": "09:34",
+   "arr_delay": 2,
+   "arr_lead": 20,
    "arr_status": "ontime",
-   "arr_seen": "09:10"
+   "arr_seen": "09:14"
   },
   {
    "key": "130914",
@@ -55,21 +55,21 @@
    "mission": "POLO",
    "dep_exp": "09:45",
    "dep_delay": 0,
-   "dep_lead": 34,
+   "dep_lead": 31,
    "cancelled": false,
    "dep_status": "ontime",
-   "last_seen": "09:10",
+   "last_seen": "09:14",
    "quai": "unknown",
    "arr_t": "10:16",
    "arr_exp": "10:16",
    "arr_delay": 0,
-   "arr_lead": 65,
+   "arr_lead": 62,
    "arr_status": "ontime",
-   "arr_seen": "09:10"
+   "arr_seen": "09:14"
   }
  ],
  "messages": [],
- "updated": "2026-11-27T09:10+01:00",
+ "updated": "2026-11-27T09:14+01:00",
  "stops": {
   "vernouillet": "STIF:StopArea:SP:47964:",
   "lazare": "STIF:StopArea:SP:58566:"
