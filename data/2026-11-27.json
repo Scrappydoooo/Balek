@@ -63,13 +63,13 @@
    "arr_t": "10:16",
    "arr_exp": "10:15",
    "arr_delay": -1,
-   "arr_lead": 6,
+   "arr_lead": 3,
    "arr_status": "ontime",
-   "arr_seen": "10:08"
+   "arr_seen": "10:11"
   }
  ],
  "messages": [],
- "updated": "2026-11-27T10:08+01:00",
+ "updated": "2026-11-27T10:11+01:00",
  "stops": {
   "vernouillet": "STIF:StopArea:SP:47964:",
   "lazare": "STIF:StopArea:SP:58566:"
