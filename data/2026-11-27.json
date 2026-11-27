@@ -1,0 +1,10 @@
+{
+ "date": "2026-11-27",
+ "trains": [],
+ "messages": [],
+ "updated": "2026-11-27T01:45+01:00",
+ "stops": {
+  "vernouillet": "STIF:StopArea:SP:47964:",
+  "lazare": "STIF:StopArea:SP:58566:"
+ }
+}
