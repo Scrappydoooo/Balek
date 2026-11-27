@@ -62,14 +62,14 @@
    "quai": "unknown",
    "arr_t": "10:16",
    "arr_exp": "10:16",
-   "arr_delay": 1,
-   "arr_lead": 23,
+   "arr_delay": 0,
+   "arr_lead": 20,
    "arr_status": "ontime",
-   "arr_seen": "09:53"
+   "arr_seen": "09:56"
   }
  ],
  "messages": [],
- "updated": "2026-11-27T09:53+01:00",
+ "updated": "2026-11-27T09:56+01:00",
  "stops": {
   "vernouillet": "STIF:StopArea:SP:47964:",
   "lazare": "STIF:StopArea:SP:58566:"
