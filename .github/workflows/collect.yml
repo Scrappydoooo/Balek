@@ -1,18 +1,22 @@
 name: Collecte ligne J
 
-# GitHub lance mal les tâches programmées fréquentes : un lancement toutes les
-# 5 minutes devient souvent un toutes les 3 heures. Ici, chaque lancement reste
-# donc actif et relève les trains toutes les 3 minutes jusqu'à la fin de la
-# plage (matin 5 h - 10 h 30, soir 15 h - 23 h, heure de Paris). Il suffit
-# qu'un seul des déclenchements ci-dessous passe pour couvrir la suite.
+# GitHub lance très mal les tâches programmées sur un petit dépôt : quelques
+# déclenchements par jour, souvent avec des heures de retard. Le collecteur ne
+# compte donc plus dessus. Chaque lancement relève les trains toutes les
+# 3 minutes pendant les plages (matin 5 h - 10 h 30, soir 15 h - 23 h, heure de
+# Paris, du lundi au vendredi), attend entre deux plages, puis relance lui-même
+# le lancement suivant juste avant la limite de 6 h imposée par GitHub : la
+# chaîne ne s'arrête jamais. Les déclenchements programmés ci-dessous ne servent
+# qu'à la redémarrer si elle venait à s'interrompre.
 on:
   schedule:
-    - cron: "*/20 3-9 * * 1-5"
-    - cron: "*/20 13-21 * * 1-5"
+    - cron: "7 * * * *"
+    - cron: "37 * * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: collecte
@@ -21,7 +25,7 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,7 +44,7 @@ jobs:
             git init -q -b releves && git remote add origin "$REPO_URL"
           fi
           cp "$f" "$RUNNER_TEMP/store/collect.py"
-      - name: Relever les trains en continu
+      - name: Relever les trains et relancer la suite
         working-directory: ${{ runner.temp }}/store
         env:
           PRIM_API_KEY: ${{ secrets.PRIM_API_KEY }}
@@ -48,12 +52,16 @@ jobs:
           LAZARE_REF: ${{ vars.LAZARE_REF }}
           COLLECT_FROM: "05:30"
           COLLECT_TO: "10:00"
+          GH_TOKEN: ${{ github.token }}
+          DISPATCH_URL: ${{ github.api_url }}/repos/${{ github.repository }}/actions/workflows/collect.yml/dispatches
+          REF: ${{ github.ref_name }}
         run: |
           git config user.name "collecteur-ligne-j"
           git config user.email "collecteur@users.noreply.github.com"
           echo "collect.py" > .git/info/exclude
           in_window() {
-            local h=$((10#$(TZ=Europe/Paris date +%H%M)))
+            local d=$(TZ=Europe/Paris date +%u) h=$((10#$(TZ=Europe/Paris date +%H%M)))
+            [ $d -le 5 ] || return 1
             { [ $h -ge 500 ] && [ $h -lt 1030 ]; } || { [ $h -ge 1500 ] && [ $h -lt 2300 ]; }
           }
           save() {
@@ -67,11 +75,21 @@ jobs:
             done
             echo "::warning::Échec de l'envoi sur la branche releves"
           }
+          relancer() {
+            if curl -fsS -X POST -H "Authorization: Bearer $GH_TOKEN" -H "Accept: application/vnd.github+json" \
+                 "$DISPATCH_URL" -d "{\"ref\":\"$REF\"}"; then
+              echo "Lancement suivant demandé."
+            else
+              echo "::warning::Impossible de relancer la suite ; un déclenchement programmé prendra le relais."
+            fi
+          }
           start=$(date +%s)
           while true; do
-            python collect.py || echo "::warning::Relevé en échec, nouvel essai dans 3 minutes"
-            save
-            # Arrêt hors plage, ou avant la limite de 6 h imposée par GitHub
-            if ! in_window || [ $(( $(date +%s) - start )) -gt 19800 ]; then break; fi
+            if in_window; then
+              python collect.py || echo "::warning::Relevé en échec, nouvel essai dans 3 minutes"
+              save
+            fi
+            # Juste avant la limite de 6 h : on passe la main au lancement suivant
+            if [ $(( $(date +%s) - start )) -gt 20400 ]; then relancer; exit 0; fi
             sleep 180
           done
